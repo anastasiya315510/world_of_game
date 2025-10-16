@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scores Game</title>
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">-->
+</head>
+<body>
+    {% if error %}
+        <h1><div>
+Score is not available
+        </div></h1>
+    {% else %}
+        <h1 >The score is <div id="score">{{ score }}</div></h1>
+    {% endif %}
+
+</body>
+</html>

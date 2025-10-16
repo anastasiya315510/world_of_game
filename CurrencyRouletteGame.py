@@ -5,9 +5,8 @@
 
 
 import requests
-import freecurrencyapi
 
-from constants.constants import *
+from Constants import *
 
 
 def play(difficulty):

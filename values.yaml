@@ -1,0 +1,10 @@
+replicaCount: 2
+
+image:
+  repository: anastasiya315510/world_of_games
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80

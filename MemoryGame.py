@@ -51,4 +51,4 @@ def get_list_from_user(difficulty):
 def play(difficulty):
     list: List[int] = generate_sequence(difficulty)
     list_from_user = get_list_from_user(difficulty)
-    is_list_equal(list_from_user, list)
+    return is_list_equal(list_from_user, list)

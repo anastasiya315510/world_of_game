@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  world_of_games:
+    build:
+      context: .        # Path to your Dockerfile
+      dockerfile: Dockerfile
+    image: 315510/world_of_games:latest
+    container_name: world_of_games
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./Scores.txt:/Scores.txt
+    stdin_open: true
+    tty: true

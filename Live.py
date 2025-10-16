@@ -1,6 +1,8 @@
-from games.GuessGame import play as guess
-from games.MemoryGame import play as memory
-from games.CurrencyRouletteGame import play as currency_roulette
+from GuessGame import play as guess
+from MemoryGame import play as memory
+from CurrencyRouletteGame import play as currency_roulette
+from Score import add_score
+
 
 def welcome(name):
     print(f"Hello {name} and welcome to the World of Games (WoG).")
@@ -37,17 +39,20 @@ def load_game():
         except ValueError:
             print("Please enter a number from 1 till 5")
 
+
+    flag = False
     match number:
         case 1:
             print("Memory Game\n")
-            memory(difficulty)
+            flag = memory(difficulty)
         case 2:
             print("Guess Game starts!!!!\n")
-            guess(difficulty)
+            flag = guess(difficulty)
         case 3:
             print("You selected option 3!\n")
-            currency_roulette(difficulty)
+            flag = currency_roulette(difficulty)
         case _:
             print("Invalid input! Please enter 1, 2, or 3.")
 
-
+    if flag == True:
+        add_score(difficulty)

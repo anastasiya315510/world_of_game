@@ -33,6 +33,6 @@ def compare_results(generated_number, user_guess):
 def play(difficulty):
     generated_number = generate_number(difficulty)
     user_guess = get_guess_from_user(difficulty)
-    compare_results(generated_number, user_guess)
+    return compare_results(generated_number, user_guess)
 
 
