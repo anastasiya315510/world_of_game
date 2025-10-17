@@ -41,10 +41,11 @@ pipeline {
             }
         }
 
-     stage('Run Container') {
+stage('Run') {
     steps {
         echo "Running container for testing..."
         sh "echo '0' > ${DUMMY_SCORES}"
+
         sh """
             docker run -d \
                 --name ${CONTAINER_NAME} \
@@ -53,7 +54,7 @@ pipeline {
                 -e TEST_MODE=True \
                 ${IMAGE_NAME}:${IMAGE_TAG}
 
-            # Wait for Flask server, retry up to 10 times
+            # Wait until Flask server is ready (retry up to 10 times)
             for i in \$(seq 1 10); do
                 if curl -s http://127.0.0.1:5000 > /dev/null; then
                     echo "Server is up!"
@@ -70,6 +71,7 @@ pipeline {
         """
     }
 }
+
 
 
 
