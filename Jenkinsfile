@@ -48,7 +48,7 @@ pipeline {
             steps {
                 echo "Running Selenium e2e tests..."
                 script {
-                    def result = sh(script: "python3 test/e2e.py", returnStatus: true)
+                    def result = sh(script: "python3 tests/e2e.py", returnStatus: true)
                     if (result != 0) {
                         error("❌ Selenium tests failed!")
                     } else {
