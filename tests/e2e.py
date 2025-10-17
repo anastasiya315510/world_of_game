@@ -1,3 +1,4 @@
+import os
 import sys
 
 import requests
@@ -5,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from MainGame import launch_flask_server
 
 
