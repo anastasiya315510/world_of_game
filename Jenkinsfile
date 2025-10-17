@@ -65,10 +65,12 @@ pipeline {
                 sh "docker rm ${CONTAINER_NAME} || true"
 
                 echo "Pushing image to Docker Hub..."
-                sh """
-                    docker login -u your-dockerhub-username -p your-dockerhub-password
-                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                """
+               withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
+                                        usernameVariable: 'DOCKER_USER',
+                                        passwordVariable: 'DOCKER_PASS')]) {
+            sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+            sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
             }
         }
     }
