@@ -5,6 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+from MainGame import launch_flask_server
+
 
 def check_server_alive(url):
     """Check if the score server is reachable."""
@@ -56,6 +58,8 @@ def test_scores_service(url: str)->bool:
 def main_function():
     """Main entry point — runs tests and exits with OS exit code."""
     score_server_url="http://127.0.0.1:5000/"
+
+    launch_flask_server()
 
     if not check_server_alive(score_server_url):
         print("❌ Score server not reachable. Tests skipped.")
