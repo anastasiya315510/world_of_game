@@ -6,6 +6,7 @@ from Live import *
 
 
 def main():
+    launch_flask_server()
     welcome("User")
     load_game()
 
@@ -13,7 +14,7 @@ def main():
     print("Game finished! 🎉")
 
     # ✅ After the game ends, launch the Flask server
-    launch_flask_server()
+    # launch_flask_server()
 
     while True:
         load_game()  # play a round
