@@ -6,6 +6,7 @@ pipeline {
         IMAGE_TAG = "latest"
         DUMMY_SCORES = "dummy_scores.txt"
         CONTAINER_NAME = "world_of_games_test"
+        VENV_PATH = "${WORKSPACE}/venv"
     }
 
     stages {
@@ -17,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
                 echo "Building Docker image..."
                 sh """
@@ -26,12 +27,10 @@ pipeline {
             }
         }
 
-        stage('Run') {
+        stage('Run Container') {
             steps {
                 echo "Running container for testing..."
-                // Create dummy Scores.txt if it doesn't exist
                 sh "echo '0' > ${DUMMY_SCORES}"
-
                 sh """
                     docker run -d \
                     --name ${CONTAINER_NAME} \
@@ -39,32 +38,29 @@ pipeline {
                     -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                 """
-                // Wait a few seconds for Flask server to start
                 sleep 5
             }
         }
 
-		stage('Setup Python venv') {
-    steps {
-        echo "Creating Python virtual environment..."
-        sh """
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install --upgrade pip
-            pip install selenium
-        """
-    }
-}
+        stage('Setup Python venv') {
+            steps {
+                echo "Creating Python virtual environment and installing dependencies..."
+                sh """
+                    python3 -m venv ${VENV_PATH}
+                    ${VENV_PATH}/bin/pip install --upgrade pip
+                    ${VENV_PATH}/bin/pip install -r requirements.txt
+                """
+            }
+        }
 
-       stage('Test') {
-    steps {
-        echo "Running Selenium e2e tests in venv..."
-        sh """
-            . venv/bin/activate
-            python tests/e2e.py
-        """
-    }
-}
+        stage('Run Selenium Tests') {
+            steps {
+                echo "Running Selenium e2e tests..."
+                sh """
+                    ${VENV_PATH}/bin/python tests/e2e.py
+                """
+            }
+        }
 
         stage('Finalize') {
             steps {
@@ -72,13 +68,13 @@ pipeline {
                 sh "docker stop ${CONTAINER_NAME} || true"
                 sh "docker rm ${CONTAINER_NAME} || true"
 
-                echo "Pushing image to Docker Hub..."
-               withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
-                                        usernameVariable: 'DOCKER_USER',
-                                        passwordVariable: 'DOCKER_PASS')]) {
-            sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
-            sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-        }
+                echo "Pushing Docker image..."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
+                                                 usernameVariable: 'DOCKER_USER',
+                                                 passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                }
             }
         }
     }
