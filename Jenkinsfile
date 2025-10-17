@@ -48,7 +48,7 @@ pipeline {
     steps {
         echo "Running Selenium e2e tests in venv..."
         sh """
-            source venv/bin/activate
+            . venv/bin/activate
             python tests/e2e.py
         """
     }
