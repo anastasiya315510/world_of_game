@@ -27,25 +27,36 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+     stage('Run Container') {
     steps {
         echo "Running container for testing..."
         sh "echo '0' > ${DUMMY_SCORES}"
         sh """
             docker run -d \
-            --name ${CONTAINER_NAME} \
-            -p 5000:5000 \
-            -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
-            ${IMAGE_NAME}:${IMAGE_TAG}
+                --name ${CONTAINER_NAME} \
+                -p 5000:5000 \
+                -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
+                -e TEST_MODE=True \
+                ${IMAGE_NAME}:${IMAGE_TAG}
 
-            # Wait until Flask server is ready
-            until curl -s http://127.0.0.1:5000 > /dev/null; do
-                echo "Waiting for server..."
-                sleep 1
+            # Wait for Flask server, retry up to 10 times
+            for i in \$(seq 1 10); do
+                if curl -s http://127.0.0.1:5000 > /dev/null; then
+                    echo "Server is up!"
+                    break
+                else
+                    echo "Waiting for server... Attempt \$i/10"
+                    sleep 3
+                fi
+                if [ \$i -eq 10 ]; then
+                    echo "Server did not start after 10 attempts."
+                    exit 1
+                fi
             done
         """
     }
 }
+
 
 
         stage('Setup Python venv') {
