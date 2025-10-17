@@ -29,6 +29,6 @@ def score_server():
 
 if __name__ == "__main__" or TEST_MODE:
     # Run Flask server directly
-    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    app.run(host="0.0.0.0", port=5001, debug=False, use_reloader=False)
 
 
