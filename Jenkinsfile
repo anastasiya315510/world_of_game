@@ -44,6 +44,18 @@ pipeline {
             }
         }
 
+		stage('Setup Python venv') {
+    steps {
+        echo "Creating Python virtual environment..."
+        sh """
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install selenium
+        """
+    }
+}
+
        stage('Test') {
     steps {
         echo "Running Selenium e2e tests in venv..."
