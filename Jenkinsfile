@@ -11,6 +11,20 @@ pipeline {
 
     stages {
 
+		stage('Clean Workspace') {
+    steps {
+        echo "Cleaning workspace..."
+        deleteDir() // Jenkins pipeline command
+    }
+}
+
+		stage('Cleanup previous containers') {
+    steps {
+        echo "Removing any leftover Docker containers..."
+        sh "docker rm -f world_of_games_test || true"
+    }
+}
+
         stage('Checkout') {
             steps {
                 echo "Checking out repository..."
