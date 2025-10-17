@@ -5,7 +5,9 @@ from Utils import SCORES_FILE_NAME
 
 app = Flask(__name__)
 
+import os
 
+TEST_MODE = os.environ.get("TEST_MODE", "False") == "True"
 
 def read_score_from_file(scores_file):
     import os
@@ -33,7 +35,7 @@ def score_server():
 
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" or TEST_MODE:
     # Run Flask server directly
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
