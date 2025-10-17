@@ -49,7 +49,7 @@ stage('Run') {
         sh """
             docker run -d \
                 --name ${CONTAINER_NAME} \
-                -p 5000:5000 \
+                -p 8777:5000 \
                 -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
                 -e TEST_MODE=True \
                 ${IMAGE_NAME}:${IMAGE_TAG}

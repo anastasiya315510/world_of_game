@@ -59,7 +59,7 @@ def test_scores_service(url: str)->bool:
 
 def main_function():
     """Main entry point — runs tests and exits with OS exit code."""
-    score_server_url="http://127.0.0.1:5000/"
+    score_server_url = "http://127.0.0.1:8778/"
 
     launch_flask_server()
 
