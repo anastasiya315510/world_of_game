@@ -6,24 +6,11 @@ pipeline {
         IMAGE_TAG = "latest"
         DUMMY_SCORES = "dummy_scores.txt"
         CONTAINER_NAME = "world_of_games_test"
-        VENV_PATH = "${WORKSPACE}/venv"
+        FLASK_PORT = "5001"   // 🔹 Flask server port inside the container
+        HOST_PORT = "8777"    // 🔹 external port for Jenkins access
     }
 
     stages {
-
-		stage('Clean Workspace') {
-    steps {
-        echo "Cleaning workspace..."
-        deleteDir() // Jenkins pipeline command
-    }
-}
-
-		stage('Cleanup previous containers') {
-    steps {
-        echo "Removing any leftover Docker containers..."
-        sh "docker rm -f world_of_games_test || true"
-    }
-}
 
         stage('Checkout') {
             steps {
@@ -32,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 echo "Building Docker image..."
                 sh """
@@ -41,70 +28,55 @@ pipeline {
             }
         }
 
-stage('Run') {
-    steps {
-        echo "Running container for testing..."
-        sh "echo '0' > ${DUMMY_SCORES}"
+        stage('Run') {
+            steps {
+                echo "Running container for testing..."
+                sh "echo '0' > ${DUMMY_SCORES}"
 
-        sh """
-            docker run -d \
-                --name ${CONTAINER_NAME} \
-                -p 8777:5000 \
-                -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
-                -e TEST_MODE=True \
-                ${IMAGE_NAME}:${IMAGE_TAG}
-
-            # Wait until Flask server is ready (retry up to 10 times)
-            for i in \$(seq 1 10); do
-                if curl -s http://127.0.0.1:5000 > /dev/null; then
-                    echo "Server is up!"
-                    break
-                else
-                    echo "Waiting for server... Attempt \$i/10"
-                    sleep 3
-                fi
-                if [ \$i -eq 10 ]; then
-                    echo "Server did not start after 10 attempts."
-                    exit 1
-                fi
-            done
-        """
-    }
-}
-
-
-
+                sh """
+                    docker run -d \
+                    --name ${CONTAINER_NAME} \
+                    -p ${HOST_PORT}:${FLASK_PORT} \
+                    -v \$(pwd)/${DUMMY_SCORES}:/app/Scores.txt \
+                    -e TEST_MODE=True \
+                    ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+                sleep 5
+            }
+        }
 
         stage('Setup Python venv') {
             steps {
-                echo "Creating Python virtual environment and installing dependencies..."
+                echo "Creating Python virtual environment..."
                 sh """
-                    python3 -m venv ${VENV_PATH}
-                    ${VENV_PATH}/bin/pip install --upgrade pip
-                    ${VENV_PATH}/bin/pip install -r requirements.txt
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
                 """
             }
         }
 
-        stage('Run Selenium Tests') {
+        stage('Test') {
             steps {
                 echo "Running Selenium e2e tests..."
                 sh """
-                    ${VENV_PATH}/bin/python tests/e2e.py
+                    . venv/bin/activate
+                    python tests/e2e.py
                 """
             }
         }
 
         stage('Finalize') {
             steps {
-                echo "Stopping test container..."
+                echo "Stopping and cleaning up container..."
                 sh "docker stop ${CONTAINER_NAME} || true"
                 sh "docker rm ${CONTAINER_NAME} || true"
 
-                echo "Pushing Docker image..."
+                echo "Pushing image to Docker Hub..."
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',
-                                                 usernameVariable: 'DOCKER_USER',
-                                                 passwordVariable: 'DOCKER_PASS')]) {
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS')]) {
                     sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
                     sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
