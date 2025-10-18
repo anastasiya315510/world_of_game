@@ -3,7 +3,7 @@ import os
 import platform
 import time
 
-SCORES_FILE_NAME = "/app/Scores.txt"
+SCORES_FILE_NAME = "./Scores.txt"
 
 BAD_RETURN_CODE = -1
 
