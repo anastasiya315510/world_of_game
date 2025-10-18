@@ -46,7 +46,7 @@ def launch_flask_server():
 
 
 
-def wait_for_server(host="127.0.0.1", port=5000, timeout=10):
+def wait_for_server(host="127.0.0.1", port=5001, timeout=10):
     start = time.time()
     while True:
         try:
