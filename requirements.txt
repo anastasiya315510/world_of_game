@@ -5,5 +5,8 @@ numpy>=1.25.0
 selenium==4.36.0
 
 PyMySQL>=1.1.0
+alembic>=1.10.0
+sqlalchemy
+cryptography>=41.0
 
 

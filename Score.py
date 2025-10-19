@@ -2,6 +2,16 @@
 import os
 import pymysql
 from pymysql import Error
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+
+Base = declarative_base()
+class UserScore(Base):
+    __tablename__ = "users_scores"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), nullable=False)
+    score = Column(Integer, nullable=False)
+
 
 # Database credentials from environment variables
 DB_HOST = os.getenv("DB_HOST", "db")
