@@ -1,7 +1,7 @@
 # Score.py
 import os
-import mysql.connector
-from mysql.connector import Error
+import pymysql
+from pymysql import Error
 
 # Database credentials from environment variables
 DB_HOST = os.getenv("DB_HOST", "db")
@@ -12,13 +12,16 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "password")  # set in Docker Compose
 
 def get_connection():
     """Return a MySQL connection"""
-    return mysql.connector.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
+
+
+    conn = pymysql.connect(
+        host=os.environ['DB_HOST'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASSWORD'],
+        database=os.environ['DB_NAME'],
+        port=int(os.environ.get('DB_PORT', 3306))
     )
+
 
 def init_db():
     """Create the table if it doesn't exist"""

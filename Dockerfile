@@ -2,16 +2,29 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY . /app
+# Install system packages required to build mysqlclient
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    default-libmysqlclient-dev \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    pkg-config \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
+COPY . /app
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 
-# Run main.py (CLI game launches Flask in background)
 CMD ["python", "MainGame.py"]
+
+
+
+
 
 
 
