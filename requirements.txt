@@ -1,0 +1,9 @@
+flask
+requests>=2.31.0
+freecurrencyapi
+numpy>=1.25.0
+selenium==4.36.0
+requests
+mysql
+
+
