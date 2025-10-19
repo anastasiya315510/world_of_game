@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: world-of-games
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: world-of-games
+  template:
+    metadata:
+      labels:
+        app: world-of-games
+    spec:
+      containers:
+        - name: world-of-games
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          envFrom:
+            - secretRef:
+                name: world-of-games-db-secret

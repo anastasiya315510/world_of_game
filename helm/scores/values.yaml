@@ -8,3 +8,10 @@ image:
 service:
   type: ClusterIP
   port: 80
+
+
+mysql:
+  host: world-of-games-db
+  secretName: world-of-games-db-secret
+  persistentVolume:
+    size: 1Gi
