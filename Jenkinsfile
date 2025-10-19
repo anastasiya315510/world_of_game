@@ -67,6 +67,7 @@ pipeline {
             }
         }
 
+
         stage('Finalize') {
             steps {
                 echo "Stopping and cleaning up container..."
@@ -82,7 +83,30 @@ pipeline {
                 }
             }
         }
+
+		stage('Deploy Helm Chart') {
+            steps {
+                sh '''
+                export DB_USER=${DB_USER}
+                export DB_PASSWORD=${DB_PASSWORD}
+                helm upgrade --install world-of-games ./helm/scores \
+                    --set mysql.user=$DB_USER \
+                    --set mysql.password=$DB_PASSWORD \
+                    --set mysql.database=$DB_NAME \
+                    --set mysql.host=$DB_HOST
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
+            }
+        }
     }
+
+
 
     post {
         always {
