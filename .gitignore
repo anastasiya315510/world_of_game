@@ -1,3 +1,22 @@
 .venv
 .idea
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 .env
+# Virtual environment
+.venv/
+venv/
+
+# Alembic / migration logs or temp files
+alembic/__pycache__/
+
+# IDE files
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+*.swp
