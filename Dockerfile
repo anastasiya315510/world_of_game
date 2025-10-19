@@ -6,6 +6,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     default-libmysqlclient-dev \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
     pkg-config \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
