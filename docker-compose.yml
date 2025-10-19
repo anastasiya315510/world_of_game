@@ -1,17 +1,41 @@
 version: "3.9"
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: world_of_games_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}   # <-- use variable directly
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
   world_of_games:
     build:
-      context: .        # Path to your Dockerfile
+      context: .
       dockerfile: Dockerfile
     image: 315510/world_of_games:latest
     container_name: world_of_games
+    depends_on:
+      - db
     ports:
       - "5000:5000"
     volumes:
       - ./Scores.txt:/app/Scores.txt
     environment:
-      - SCORES_FILE_NAME=/app/Scores.txt
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}       # <-- use variable directly
+      TEST_MODE: ${TEST_MODE:-False}
     stdin_open: true
     tty: true
+
+volumes:
+  db_data:

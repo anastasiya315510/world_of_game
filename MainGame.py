@@ -31,10 +31,10 @@ def launch_flask_server():
     print("Starting score server...")
 
     # Kill old Flask processes (Linux)
-    os.system("pkill -f MainScores.py")
+    os.system("pkill -f MainScores_old.py")
 
     # Start Flask in background
-    script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "", "MainScores.py")
+    script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "", "MainScores_old.py")
     subprocess.Popen([sys.executable, script_path])
 
     # Wait until Flask is ready

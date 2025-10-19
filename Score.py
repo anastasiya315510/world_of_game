@@ -1,36 +1,73 @@
-from Utils import SCORES_FILE_NAME
+# Score.py
+import os
+import mysql.connector
+from mysql.connector import Error
 
+# Database credentials from environment variables
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
+DB_NAME = os.getenv("DB_NAME", "games")
+DB_USER = os.getenv("DB_USER", "user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "password")  # set in Docker Compose
 
-def add_score(difficulty):
-    # POINTS_OF_WINNING = (DIFFICULTY X 3) + 5
-    difficulty = int(difficulty)
-    points_of_winning = difficulty*3 +5
+def get_connection():
+    """Return a MySQL connection"""
+    return mysql.connector.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD
+    )
 
-
-    existing_score = read_file_value()
-
-    existing_score = int(existing_score)
-
-    sum = existing_score + points_of_winning
-    write_file_value(sum)
-
-
-
-def read_file_value():
+def init_db():
+    """Create the table if it doesn't exist"""
     try:
-        with open(SCORES_FILE_NAME , "r") as file:
-            line = file.readline().strip()
-            if line == "":
-                return 0
-            score = int(line)
-            return score
-    except FileNotFoundError:
-        score = 0
-        return score
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users_scores (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                score INT NOT NULL
+            )
+        """)
+        conn.commit()
+    except Error as e:
+        print(f"Error initializing database: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
+def write_score(score: int):
+    """Insert the score into the database"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO users_scores (score) VALUES (%s)", (score,))
+        conn.commit()
+    except Error as e:
+        print(f"Error writing score: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
-def write_file_value(score):
-    with open(SCORES_FILE_NAME , "w") as file:
-        file.write(str(score))
-
-
+def read_score():
+    """Return the latest score from the database, or 0 if none"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT score FROM users_scores ORDER BY id DESC LIMIT 1")
+        result = cursor.fetchone()
+        return result[0] if result else 0
+    except Error as e:
+        print(f"Error reading score: {e}")
+        return 0
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
